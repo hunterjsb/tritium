@@ -6,13 +6,24 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/we-be/tritium/internal/storage"
 )
 
 func verifyBrowser(w http.ResponseWriter, r *http.Request) {
-	// Extract the signature from the query parameters
-	signature := r.URL.Query().Get("signature")
+	// Extract the base64 encoded code from the URL path
+	path := r.URL.Path
+	parts := strings.Split(path, "/")
+	if len(parts) != 3 {
+		http.Error(w, "Invalid URL path", http.StatusBadRequest)
+		return
+	}
+
+	code := parts[2]
+	fmt.Println("RECEIVED CODE", code)
+
+	signature := "TEMPxSIG"
 
 	// Set the cookie with the signature value
 	cookie := &http.Cookie{
@@ -24,8 +35,9 @@ func verifyBrowser(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, cookie)
 
-	// Redirect the user to a confirmation page or the main application page
-	http.Redirect(w, r, "/cookie-set-confirmation", http.StatusFound)
+	w.Header().Set("content-type", "text/plain")
+	w.Write([]byte("SIGSET: " + signature))
+	// w.Write([]byte("browser verified"))
 }
 
 func handleMessage(w http.ResponseWriter, r *http.Request) {
