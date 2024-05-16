@@ -20,9 +20,11 @@ func verifyBrowser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO verify code
 	code := parts[2]
 	fmt.Println("RECEIVED CODE", code)
 
+	// TODO generate sig
 	signature := "TEMPxSIG"
 
 	// Set the cookie with the signature value

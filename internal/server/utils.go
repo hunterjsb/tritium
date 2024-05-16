@@ -4,19 +4,30 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"log"
+	"time"
 )
 
-func randLink(length int) string {
-	// Generate a random 64-character base64 string
+func RandLink(length int) string {
+	// Generate a random byte slice of the specified length
 	b := make([]byte, length)
 	_, err := rand.Read(b)
 	if err != nil {
 		log.Fatal(err)
 	}
-	randomString := base64.URLEncoding.EncodeToString(b)
+
+	// Add additional entropy using the current timestamp
+	timestamp := time.Now().UnixNano()
+	timestampBytes := make([]byte, 8)
+	for i := 0; i < 8; i++ {
+		timestampBytes[i] = byte(timestamp >> (i * 8))
+	}
+	b = append(b, timestampBytes...)
+
+	// Encode the byte slice using base64 RawURLEncoding
+	randomString := base64.RawURLEncoding.EncodeToString(b)
 
 	// Generate the secure link URL
-	secureLink := "https://tritium.example.com/verify/" + randomString
+	link := "https://tritium.example.com/verify/" + randomString
 
-	return secureLink
+	return link
 }
