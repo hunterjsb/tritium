@@ -3,6 +3,7 @@ package storage
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"strconv"
 )
@@ -15,6 +16,25 @@ const (
 	BulkString   = '$'
 	Array        = '*'
 )
+
+// !! RedisCommand is WIP !!
+type RedisCommand []byte
+
+func (cmd *RedisCommand) AppendBulkString(s string) {
+	bulkStrLength := fmt.Sprintf("$%d\r\n", len(s))
+	newCmd := fmt.Sprintf("%s%s\r\n", bulkStrLength, s)
+	*cmd = append(*cmd, []byte(newCmd)...)
+}
+
+func NewCommand(s ...string) RedisCommand {
+	cmdStr := fmt.Sprintf("*%d\r\n", len(s))
+	for _, str := range s {
+		cmdStr += fmt.Sprint(len(str)) + "\r\n"
+		cmdStr += str + "\r\n"
+	}
+
+	return RedisCommand(cmdStr)
+}
 
 // Reader is a RESP reader
 type Reader struct {
