@@ -39,17 +39,14 @@ func (cmd *RespCommand) Execute(conn net.Conn) (int, error) {
 	return conn.Write(*cmd)
 }
 
-// Reader is a RESP reader
 type Reader struct {
 	r *bufio.Reader
 }
 
-// NewReader creates a new RESP reader
 func NewReader(r io.Reader) *Reader {
 	return &Reader{r: bufio.NewReader(r)}
 }
 
-// ReadValue reads a RESP value
 func (r *Reader) ReadValue() (interface{}, error) {
 	b, err := r.r.ReadByte()
 	if err != nil {
