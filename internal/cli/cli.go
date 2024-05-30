@@ -3,6 +3,7 @@ package cli
 import (
 	"flag"
 	"fmt"
+	"net"
 	"os"
 
 	"github.com/we-be/tritium/internal/server"
@@ -21,10 +22,21 @@ func Run() {
 	command := flag.Arg(0)
 	switch command {
 	case "generate-link":
-		link := server.RandLink(*lengthFlag)
+		conn := connGarnet()
+		link := server.RandLink(conn, *lengthFlag)
 		fmt.Println(link)
+		conn.Close()
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
 		os.Exit(1)
 	}
+}
+
+func connGarnet() net.Conn {
+	// Don't forget to close the connect
+	conn, err := net.Dial("tcp", "localhost:6379")
+	if err != nil {
+		panic(err)
+	}
+	return conn
 }
