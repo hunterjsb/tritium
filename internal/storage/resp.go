@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"strconv"
 )
 
@@ -17,23 +18,25 @@ const (
 	Array        = '*'
 )
 
-// !! RedisCommand is WIP !!
-type RedisCommand []byte
+type RespCommand []byte
 
-func (cmd *RedisCommand) AppendBulkString(s string) {
+func (cmd *RespCommand) AppendBulkString(s string) {
 	bulkStrLength := fmt.Sprintf("$%d\r\n", len(s))
 	newCmd := fmt.Sprintf("%s%s\r\n", bulkStrLength, s)
 	*cmd = append(*cmd, []byte(newCmd)...)
 }
 
-func NewCommand(s ...string) RedisCommand {
+func NewCommand(s ...string) *RespCommand {
 	cmdStr := fmt.Sprintf("*%d\r\n", len(s))
+	cmd := RespCommand([]byte(cmdStr))
 	for _, str := range s {
-		cmdStr += fmt.Sprint(len(str)) + "\r\n"
-		cmdStr += str + "\r\n"
+		cmd.AppendBulkString(str)
 	}
+	return &cmd
+}
 
-	return RedisCommand(cmdStr)
+func (cmd *RespCommand) Execute(conn net.Conn) (int, error) {
+	return conn.Write(*cmd)
 }
 
 // Reader is a RESP reader

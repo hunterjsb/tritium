@@ -18,7 +18,7 @@ func TestGarnet(t *testing.T) {
 	reader := NewReader(conn)
 
 	// Send a PING command to check the connection
-	_, err = conn.Write([]byte("*1\r\n$4\r\nPING\r\n"))
+	_, err = NewCommand("PING").Execute(conn)
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +31,8 @@ func TestGarnet(t *testing.T) {
 	fmt.Println("Connected to Garnet server:", pong)
 
 	// Send a SET command to set a key-value pair
-	_, err = conn.Write([]byte("*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n"))
+	// _, err = conn.Write([]byte("*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n"))
+	_, err = NewCommand("SET", "foo", "bar").Execute(conn)
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +45,7 @@ func TestGarnet(t *testing.T) {
 	fmt.Println("SET response:", setResponse)
 
 	// Send a GET command to retrieve the value of a key
-	_, err = conn.Write([]byte("*2\r\n$3\r\nGET\r\n$3\r\nkey\r\n"))
+	_, err = NewCommand("GET", "foo").Execute(conn)
 	if err != nil {
 		panic(err)
 	}
