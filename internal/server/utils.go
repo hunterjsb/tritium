@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"fmt"
 	"log"
 	"net"
 
@@ -25,10 +26,10 @@ func RandLink(conn net.Conn, length int) string {
 	publicKey := &privateKey.PublicKey
 
 	// Encode the private key as PEM
-	// privateKeyPEM := pem.EncodeToMemory(&pem.Block{
-	//     Type:  "RSA PRIVATE KEY",
-	//     Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
-	// })
+	privateKeyPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
+	})
 
 	// Encode the public key as PEM
 	publicKeyPEM := pem.EncodeToMemory(&pem.Block{
@@ -45,13 +46,11 @@ func RandLink(conn net.Conn, length int) string {
 
 	randomString := base64.URLEncoding.EncodeToString(b)
 
-	// Store the private key and public key in the user's browser (you'll need to implement this part)
-	// For example, you can use cookies or local storage to store the keys
-
-	// Store the server's public key in the database
-	_, err = storage.NewCommand("SETEX", randomString+"_server_public_key", TOKEN_EXPIRY, string(publicKeyPEM)).Execute(conn)
-	if err != nil {
-		panic(err)
+	// Store the keys in the database
+	_, privErr := storage.NewCommand("SETEX", fmt.Sprintf("server:%s:privkey", randomString), TOKEN_EXPIRY, string(privateKeyPEM)).Execute(conn)
+	_, pubErr := storage.NewCommand("SETEX", fmt.Sprintf("server:%s:pubkey", randomString), TOKEN_EXPIRY, string(publicKeyPEM)).Execute(conn)
+	if privErr != nil || pubErr != nil {
+		panic("error setting key in storage")
 	}
 
 	// Generate the secure link URL
