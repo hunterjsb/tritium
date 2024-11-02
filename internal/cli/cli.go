@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"net"
 	"os"
-
-	"github.com/we-be/tritium/internal/server"
 )
 
 func Run() {
-	lengthFlag := flag.Int("length", 32, "Length of the random link")
 	flag.Parse()
 
 	if flag.NArg() == 0 {
@@ -24,7 +21,7 @@ func Run() {
 
 	switch command {
 	case "generate-link":
-		link := server.RandLink(conn, *lengthFlag)
+		link := "ZELDA"
 		fmt.Println(link)
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
