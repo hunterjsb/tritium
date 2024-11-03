@@ -5,14 +5,14 @@ Tritium is a secure, RAM-only storage system with zero dependencies. See [tritiu
 ## Installation
 
 ```bash
-go get github.com/hunterjsb/tritium
+go get github.com/we-be/tritium
 ```
 
 ## Quick Start
 
 ```go
 import (
-    "github.com/hunterjsb/tritium/pkg/client"
+    "github.com/we-be/tritium/pkg/client"
 )
 
 func main() {
