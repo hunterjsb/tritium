@@ -12,7 +12,7 @@ import (
 func Example() {
 	// Create a new client
 	client, err := tritium.NewClient(&tritium.ClientOptions{
-		Address: "localhost:8080",
+		Address: "localhost:40585",
 		Timeout: 5 * time.Second,
 	})
 	if err != nil {
