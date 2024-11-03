@@ -1,4 +1,3 @@
-// pkg/tritium/client.go
 package tritium
 
 import (

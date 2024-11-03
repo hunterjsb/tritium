@@ -1,4 +1,3 @@
-// pkg/tritium/example_test.go
 package tritium_test
 
 import (
