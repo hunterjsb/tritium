@@ -9,8 +9,6 @@ import (
 	"github.com/we-be/tritium/pkg/storage"
 )
 
-const PORT string = ":40585" // ADD YOUR PORT!!
-
 // Client represents a Tritium RPC client
 type Client struct {
 	rpc *rpc.Client
@@ -24,7 +22,14 @@ type ClientOptions struct {
 
 // NewClient creates a new Tritium client
 func NewClient(opts *ClientOptions) (*Client, error) {
-	client, err := rpc.Dial("tcp", PORT)
+	if opts == nil {
+		opts = &ClientOptions{
+			Address: "localhost:8080",
+			Timeout: 10 * time.Second,
+		}
+	}
+
+	client, err := rpc.Dial("tcp", opts.Address)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to tritium server: %w", err)
 	}
