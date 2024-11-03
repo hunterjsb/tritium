@@ -1,6 +1,6 @@
 # Tritium
 
-Tritium is a secure, RAM-only storage system with zero dependencies.
+Tritium is a secure, RAM-only storage system with zero dependencies. See [tritium-wails](https://github.com/we-be/tritium-wails) for the desktop client.
 
 ## Installation
 
