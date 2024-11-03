@@ -118,3 +118,10 @@ func (s *Server) Get(args *storage.GetArgs, reply *storage.GetReply) error {
 
 	return nil
 }
+
+func (s *Server) GetAddress() string {
+	if s.listener == nil {
+		return ""
+	}
+	return s.listener.Addr().String()
+}
