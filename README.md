@@ -34,3 +34,6 @@ Tritium emphasizes security through:
 - Zero dependencies
 - Secure memory management
 - Optional client-side encryption
+
+## Persistence and Scaling
+Read the proposal [here](https://gist.github.com/hunterjsb/572f8e3b66dde9551e3fa3652f6b40b7)
