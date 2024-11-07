@@ -18,6 +18,7 @@ type Server struct {
 	rpc      *rpc.Server
 	stats    ServerStats
 	stopCh   chan struct{}
+	cluster  *ClusterInfo // New field
 }
 
 type ServerStats struct {
@@ -27,10 +28,11 @@ type ServerStats struct {
 
 // NewServer creates a new Tritium server
 func NewServer(config config.Config) (*Server, error) {
+	// Initialize with empty replica list - we'll add replicas through the cluster
 	store, err := storage.NewRespServer(
 		config.MemStoreAddr,
 		config.MaxConnections,
-		config.ReplicaAddrs,
+		[]string{}, // Start with no replicas
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create RESP server: %w", err)
@@ -45,6 +47,18 @@ func NewServer(config config.Config) (*Server, error) {
 	// Register RPC methods
 	if err := srv.rpc.RegisterName("Store", srv); err != nil {
 		return nil, fmt.Errorf("failed to register RPC methods: %w", err)
+	}
+
+	// Initialize cluster capabilities
+	if err := srv.initCluster(config.RPCAddr, config.MemStoreAddr); err != nil {
+		return nil, fmt.Errorf("failed to initialize cluster: %w", err)
+	}
+
+	// If we have a join address, join the cluster
+	if config.JoinAddr != "" {
+		if err := srv.JoinCluster(config.JoinAddr); err != nil {
+			return nil, fmt.Errorf("failed to join cluster: %w", err)
+		}
 	}
 
 	return srv, nil
@@ -165,6 +179,11 @@ func (s *Server) Stop() error {
 	// Signal acceptLoop to stop
 	close(s.stopCh)
 
+	// Stop cluster operations
+	if s.cluster != nil {
+		s.cluster.stopCluster()
+	}
+
 	// Close listener
 	if s.listener != nil {
 		if err := s.listener.Close(); err != nil {
@@ -185,4 +204,15 @@ func (s *Server) GetAddress() string {
 		return ""
 	}
 	return s.listener.Addr().String()
+}
+
+// When a node joins the cluster, add its RESP server as a replica
+func (s *Server) addNodeAsReplica(node *NodeInfo) error {
+	maxConn := s.store.GetMaxConnections()
+	return s.store.AddReplica(node.RespAddr, maxConn)
+}
+
+// When a node leaves the cluster, remove its RESP server replica
+func (s *Server) removeNodeReplica(node *NodeInfo) error {
+	return s.store.RemoveReplica(node.RespAddr)
 }

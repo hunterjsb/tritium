@@ -186,3 +186,8 @@ func (rs *RespServer) RemoveReplica(addr string) error {
 
 	return fmt.Errorf("replica %s not found", addr)
 }
+
+// GetMaxConnections returns the size of the connection pool
+func (rs *RespServer) GetMaxConnections() int {
+	return cap(rs.primaryPool.conns)
+}

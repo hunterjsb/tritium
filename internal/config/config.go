@@ -3,18 +3,15 @@ package config
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
-const (
-	DEFAULT_MAX_CONN int = 4
-	DEFAULT_REPLICAS     = "" // Empty string means no replicas
-)
+const DEFAULT_MAX_CONN int = 4
 
 type Config struct {
-	MemStoreAddr   string // address of the RESP memory backend, like Redis
+	MemStoreAddr   string // address of the RESP memory backend
+	RPCAddr        string // address for RPC server
 	MaxConnections int
-	ReplicaAddrs   []string // Optional replica addresses
+	JoinAddr       string // optional address to join existing cluster
 }
 
 func NewConfigFromDotenv(fp string) (Config, error) {
@@ -29,19 +26,10 @@ func NewConfigFromDotenv(fp string) (Config, error) {
 		maxConn = DEFAULT_MAX_CONN
 	}
 
-	// Parse replica addresses from env var (comma-separated)
-	var replicaAddrs []string
-	if replicas := cfg["SECURE_STORE_REPLICAS"]; replicas != "" {
-		replicaAddrs = strings.Split(replicas, ",")
-		// Trim any whitespace
-		for i := range replicaAddrs {
-			replicaAddrs[i] = strings.TrimSpace(replicaAddrs[i])
-		}
-	}
-
 	return Config{
 		MemStoreAddr:   cfg["SECURE_STORE_ADDRESS"],
+		RPCAddr:        cfg["RPC_ADDRESS"],
 		MaxConnections: maxConn,
-		ReplicaAddrs:   replicaAddrs,
+		JoinAddr:       cfg["JOIN_ADDRESS"], // Optional
 	}, nil
 }

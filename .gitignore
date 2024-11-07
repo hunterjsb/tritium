@@ -18,3 +18,8 @@
 
 # Go workspace file
 go.work
+
+/data/
+*.env
+*.log
+*.pid
