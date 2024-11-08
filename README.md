@@ -1,7 +1,7 @@
 # Tritium
 
 Tritium is a secure, RAM-only storage system with zero dependencies. See [tritium-wails](https://github.com/we-be/tritium-wails) for the desktop client.
-It uses RESP clusters to replicate data, like a redis cluster, and RPC-level clustering to scale horizontially See the [persistence and scaling](#persistence-and-scaling) section.
+It uses RESP clusters to replicate data, like a redis cluster, and RPC-level clustering to scale horizontially. For more, see the [persistence and scaling](#persistence-and-scaling) section.
 
 ## Installation
 
